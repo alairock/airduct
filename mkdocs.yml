@@ -1,2 +1,18 @@
-theme:
-  name: 'rtd-dropdown'
+site_name: Souffle
+site_description: 'Simple Pipeline Scheduler in Python'
+site_author: 'Skyler Lewis'
+
+theme: 
+    name: rtd-dropdown
+    # Default settings
+    collapse_by_default: false
+    highlightjs: true
+    hljs_languages:
+        - yaml
+        - django
+
+    repo_url: https://github.com/alairock/souffle
+
+plugins:
+    - search
+
