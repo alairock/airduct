@@ -18,10 +18,10 @@ Souffle calls pipelines "flows". A flow is a python file with a very particular 
 Here is an example flow:
 
 ```python
-from souffle.scheduling import Schedule, task
+from souffle import schedule, task
 
 
-schedule = Schedule(
+schedule(
     name='ExampleFlow',
     run_at='* * * * *',
     flow=[
