@@ -1,209 +1,160 @@
-import sqlite3
 import pickle
 import datetime
 import uuid
+import os
 from souffle.logger import logger
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, and_
 
-DATABASE_FILE = 'example.db'
+Base = declarative_base()
+DB_TYPE = os.getenv('DATABASE_TYPE')
+Session = sessionmaker()
 
+engine = None
+if DB_TYPE == 'postgres':
+    pass
+    # TODO: handle postgres connection
+elif DB_TYPE == 'mysql':
+    pass
+    # TODO: handle mysql connection
 
-def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by the db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
-    try:
-        conn = sqlite3.connect(db_file)
-        conn.row_factory = sqlite3.Row
-        return conn
-    except Exception as e:
-        print(e)
-    return None
+elif  DB_TYPE == 'sqlite':
+    DATABASE_FILE = 'example.db'
+    engine = create_engine(f'sqlite:///{DATABASE_FILE}', echo=False)
+else:
+    engine = create_engine('sqlite:///:memory:', echo=False)
 
-
-def start_flow(flow):
-    task_id = str(uuid.uuid4())
-    conn = create_connection(DATABASE_FILE)
-    with conn:
-        sql = '''
-            SELECT status FROM flows WHERE flows.name = :name ORDER BY created_at DESC
-        '''
-        cur = conn.cursor()
-        cur.execute(sql, {'name': flow.name})
-        record = cur.fetchone()
-        last_status = False if record is None else record[0]
-        if last_status == 'InProgress':
-            logger.info('Job in progress, skipping to prevent duplicate work.')
-            return
-        # TODO: Maybe allow multiple flows to run, but this needs to be a configuration
-    with conn:
-        logger.info(f'Starting job: {flow.id}')
-        sql = '''
-            INSERT INTO flows(id, created_at, updated_at, name, status)
-                VALUES(:id, :now, :now, :name, :status)
-        '''
-        cur = conn.cursor()
-        cur.execute(sql, {'id': task_id,
-                          'now': str(datetime.datetime.now()),
-                          'name': flow.name,
-                          'status': 'InProgress'})
-        return task_id
+Session.configure(bind=engine)
 
 
-def init_task(flow_id, parents, step, task):
-    _id = str(uuid.uuid4())
-    conn = create_connection(DATABASE_FILE)
+class Task(Base):
+    __tablename__ = 'tasks'
 
-    sql = '''
-        INSERT INTO tasks(id, created_at, updated_at, flow_id, can_fail, parents, step, pickled_task) 
-                VALUES(:id, :now, :now, :flow_id, :can_fail, :parents, :step, :func)
-    '''
-    with conn:
-        conn.cursor()
-        conn.execute(sql, {'now': str(datetime.datetime.now()),
-                           'id': _id,
-                           'flow_id': flow_id,
-                           'can_fail': task.can_fail,
-                           'parents': str(parents) if len(parents) == 0 else pickle.dumps(parents),
-                           'step': step,
-                           'func': pickle.dumps(task)})
-    return _id
+    id = Column(Integer, primary_key=True)
+    status = Column(String)
+    flow_id = Column(Integer)
+    parents = Column(String)
+    step = Column(Integer)
+    pickled_task = Column(String)
+    can_fail = Column(Boolean)
+    logs = Column(String)
+    completed_at = Column(DateTime)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
 
 
-def _fetch_task(conn):
-    sql = '''
-        SELECT tasks.*
-        FROM flows
-        LEFT JOIN tasks ON tasks.flow_id = flows.id AND tasks.status IS NULL
-        WHERE flows.status = 'InProgress'
-        AND tasks.parents = '[]'
-    '''
-    cur = conn.cursor()
-    cur.execute(sql)
-    return cur.fetchone()
+class Flow(Base):
+    __tablename__ = 'flows'
+
+    id = Column(Integer, primary_key=True)
+    schedule_id = Column(Integer)
+    status = Column(String)
+    name = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
 
 
-def _update_task_status(conn, _id, status='InProgress'):
-    sql = '''
-        UPDATE tasks SET status = :status WHERE id = :id
-    '''
-    cur = conn.cursor()
-    cur.execute(sql, {'id': _id, 'status': status})
+class Schedule(Base):
+    __tablename__ = 'schedules'
 
-
-def fetch_task():
-    conn = create_connection(DATABASE_FILE)
-    with conn:
-        record = _fetch_task(conn)
-        if not record:
-            return
-        _update_task_status(conn, record['id'])
-    task = pickle.loads(record['pickled_task'])
-    task.id = record['id']
-    return task
-
-
-def _update_child(conn, record, new_parents):
-    sql = '''
-        UPDATE tasks SET parents = :parents WHERE id = :id
-    '''
-    cur = conn.cursor()
-    cur.execute(sql, {
-        'id': record['id'],
-        'parents': str([]) if not new_parents or len(new_parents) == 0 else pickle.dumps(new_parents),
-
-    })
-
-
-def _mark_flow(conn, flow_id, status="Complete"):
-    sql = '''
-        UPDATE flows SET status = :status WHERE id = :id
-    '''
-    cur = conn.cursor()
-    cur.execute(sql, {
-        'status': status,
-        'id': flow_id
-    })
-
-
-def _update_children(conn, task):
-    sql = '''
-        SELECT * FROM tasks WHERE flow_id = :flow_id AND step = :step
-    '''
-    cur = conn.cursor()
-    cur.execute(sql, {'flow_id': task.flow_id, 'step': int(task.step) + 1})
-    record = None
-    for record in cur.fetchall():
-        new_parents = None
-        if not isinstance(record['parents'], str):
-            parents = pickle.loads(record['parents'])
-            new_parents = parents.remove(task.id)
-        _update_child(conn, record, new_parents)
-    if not record:
-        logger.info(f'Flow ended: {task.flow_id}')
-        _mark_flow(conn, task.flow_id)
-        return
-
-
-def mark_task(task, status='Complete', update_children=True):
-    conn = create_connection(DATABASE_FILE)
-    with conn:
-        _update_task_status(conn, task.id, status=status)
-        if update_children:
-            _update_children(conn, task)
-        else:
-            _mark_flow(conn, task.flow_id)
-
-
-def sync_schedules(flows):
-    initdb()
-    conn = create_connection(DATABASE_FILE)
-    with conn:
-        cur = conn.cursor()
-
-        sql = '''
-            INSERT INTO schedules(created_at, updated_at, name, schedule) 
-                VALUES(:now, :now, :name, :schedule)
-            ON CONFLICT(name) 
-                DO UPDATE SET updated_at=:now, schedule=:schedule
-        '''
-        for flow in flows:
-            cur.execute(sql, {'name': flow.name,
-                              'schedule': flow.schedule,
-                              'now': str(datetime.datetime.now())})
-    return flows
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    run_at = Column(String)
+    flow = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
 
 
 def initdb():
     logger.info('Setting up database tables')
-    conn = create_connection(DATABASE_FILE)
-    with conn:
-        cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS schedules
-                     (created_at text, 
-                     updated_at text, 
-                     name text PRIMARY KEY, 
-                     schedule text)
-        ''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS flows
-                 (created_at text, 
-                 updated_at text, 
-                 id text PRIMARY KEY,
-                 name text,
-                 status text)
-        ''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS tasks
-                 (created_at text, 
-                 updated_at text, 
-                 completed_at text,
-                 status text,
-                 logs text,
-                 id text PRIMARY KEY, 
-                 flow_id text,
-                 can_fail boolean,
-                 parents text,
-                 step integer, 
-                 pickled_task text)
-        ''')
+    Base.metadata.create_all(engine)
     logger.info('Complete setting up database tables')
+
+
+def fetch_schedules():
+    session = Session()
+    results = session.query(Schedule).all()
+    return results
+
+
+def has_concurrent_flow(schedule):
+    session = Session()
+    r = session.query(Flow).filter(Flow.name.in_([schedule.name])).filter(Flow.status.in_(['InProgress'])).all()
+    if len(r) > 0:
+        return True
+    return False
+
+
+def create_flow_record(schedule):
+    session = Session()
+    flow = Flow(name=schedule.name, schedule_id=schedule.id, status='InProgress')
+    session.add(flow)
+    session.commit()
+    return flow
+
+
+def create_task_record(flow_id, parents, step, task, pickled_task):
+    session = Session()
+    task = Task(
+        flow_id=flow_id,
+        parents=str(parents) if len(parents) == 0 else pickle.dumps(parents),
+        step=step,
+        can_fail=task.get('can_fail', False),
+        pickled_task=pickled_task
+    )
+    session.add(task)
+    session.commit()
+    return task
+
+
+def fetch_task():
+    session = Session()
+    results = session.query(Flow, Task) \
+        .join(Task, and_(Task.flow_id == Flow.id, Task.status.is_(None)), isouter=True) \
+        .filter(Flow.status == 'InProgress') \
+        .filter(Task.parents.is_('[]')) \
+        .first()
+
+    if results is None:
+        return results
+    task = results[1]
+    task.status = 'InProgress'
+    session.commit()
+    return task
+
+
+def mark_task(task, status="Complete", can_fail=False, message=''):
+    session = Session()
+    session.query(Task).filter(Task.id == task.id).update({
+        'status': status,
+        'completed_at': datetime.datetime.now(),
+        'logs': message
+    })
+    session.commit()
+    if status is 'Error' and not can_fail:
+        return
+    _update_children(task)
+
+
+def _update_children(task):
+    session = Session()
+    results = session.query(Task).filter(Task.flow_id == task.flow_id).filter(Task.step == int(task.step)+1).all()
+    for r in results:
+        if not isinstance(r.parents, str):
+            parents = pickle.loads(r.parents)
+            new_parents = parents.remove(task.id)
+            r.parents = str([]) if not new_parents or len(new_parents) == 0 else pickle.dumps(new_parents)
+    session.commit()
+    if len(results) == 0:
+        logger.info(f'Flow ended: {task.flow_id}')
+        mark_flow(task.flow_id)
+        return
+
+
+def mark_flow(flow_id, status='Complete'):
+    session = Session()
+    session.query(Flow).filter(Flow.id == flow_id).update({
+        'status': status
+    })
+    session.commit()

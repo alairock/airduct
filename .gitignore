@@ -1,4 +1,5 @@
 ## Project specific stuff
+example.db
 .idea/
 analytics.iml
 docker-compose.override.yml

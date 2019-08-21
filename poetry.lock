@@ -16,17 +16,17 @@ version = "0.22.6"
 
 [[package]]
 category = "main"
-description = "Cronjobs for Wizards"
-name = "cronweasley"
+description = "Database Abstraction Library"
+name = "sqlalchemy"
 optional = false
-python-versions = "*"
-version = "1.4.9"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.3.7"
 
 [metadata]
-content-hash = "1b0ee2ed4a9f1d0f3830db3324d037d3e43da39d5e2bcbed2687a220753f402d"
+content-hash = "0dff2dff23f6d85434fffe863e0a4ea84be79fdc5584f5b4065537d388d38668"
 python-versions = "^3.7"
 
 [metadata.hashes]
 click = ["2335065e6395b9e67ca716de5f7526736bfa6ceead690adf616d925bdc622b13", "5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"]
 crontab = ["c8b4dd666e86c14ba2edf58cdd69066f4e424ff51b9af1188f43e421f5b1ecb8"]
-cronweasley = ["dd36d4c7c586177cf40204a25e49b188b0f8dc3915705a875fdd2631626bcc2e"]
+sqlalchemy = ["0459bf0ea6478f3e904de074d65769a11d74cdc34438ab3159250c96d089aef0"]

@@ -1,7 +1,7 @@
-from souffle.scheduling import Schedule, task
+from souffle import schedule, task
 
 
-schedule = Schedule(
+schedule(
     name='ExampleFlow3',
     run_at='* * * * *',
     flow=[
