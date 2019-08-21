@@ -1,6 +1,10 @@
 # souffle
 Simple Pipeline Scheduler in Python
 
+## Documentation
+
+[souffle.readthedocs.io](https://souffle.readthedocs.io)
+
 ## Installing
     $ pip install souffle
     
