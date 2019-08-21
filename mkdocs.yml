@@ -3,7 +3,7 @@ site_description: 'Simple Pipeline Scheduler in Python'
 site_author: 'Skyler Lewis'
 
 theme: 
-    name: rtd-dropdown
+    name: readthedocs
     # Default settings
     collapse_by_default: false
     highlightjs: true
