@@ -1,4 +1,5 @@
 import asyncio
+import os
 import pickle
 import crontab
 import importlib
@@ -9,16 +10,10 @@ from souffle.database import mark_task, has_concurrent_flow, create_flow_record,
 import warnings
 import time
 import datetime
-import inspect
 from souffle.logger import logger
 
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
-
-
-def _start_task(flow, parents, step, task, pickled_task):
-    task = create_task_record()
-    return task
 
 
 def start_flow(schedule):
@@ -30,6 +25,7 @@ def start_flow(schedule):
     flow = create_flow_record(schedule)
     step = 0
     parents = []
+    logger.info(f'Starting flow: {flow.id}, schedule {flow.schedule_id}')
     for task in pickle.loads(schedule.flow):
         if type(task) is list:
             future_parents = []
@@ -43,24 +39,33 @@ def start_flow(schedule):
         step += 1
 
 
-def start_scheduler(path, no_worker=True):
-    initdb()
+def start_scheduler(path, config, no_worker=False):
+    os.environ['SOUFFLE_CONFIG_FILE'] = config
+    session = initdb()
     find_flow_files(path)
     schedules = fetch_schedules()
     while True:
         for schedule in schedules:
             if crontab.CronTab(schedule.run_at).test(datetime.datetime.now()):
                 start_flow(schedule)
-        if no_worker:
+        if no_worker or str(session.bind.url) == 'sqlite:///:memory:':
             work_on_tasks()
         time.sleep(1)
+
+
+def start_worker(config):
+    os.environ['SOUFFLE_CONFIG_FILE'] = config
+    initdb()
+    while True:
+        if work_on_tasks() == 'sleep':
+            time.sleep(1)  # No work to do, let's not cruise so fast, and pound the db.
+            # Maybe make this configurable in the futer
 
 
 def work_on_tasks():
     task = fetch_task()
     if task is None:
-        return
-    # TODO: Handle/fetch timed out tasks
+        return 'sleep'
 
     logger.info(f'Starting task: {task.id}')
     task_definition = pickle.loads(task.pickled_task)
@@ -76,6 +81,8 @@ def work_on_tasks():
         raise e
 
     try:
+        # TODO: If task is taking too long, then kill it. This would be a configurable field on the Task object.
+        # eg: `if start_time + task.timout > now(): Kill task_func
         if asyncio.iscoroutinefunction(task_func):
             loop = asyncio.get_event_loop()
             loop.run_until_complete(task_func())
@@ -89,11 +96,5 @@ def work_on_tasks():
         logger.debug(f'An error happened but your task configuration allowed it. {e}')
         mark_task(task, 'Error', message=str(e))
         return
-    # TODO: Handle long running processes/multiple process handling.
     mark_task(task)
     logger.info(f'Task finished: {task.id}')
-
-
-def start_worker():
-    while True:
-        work_on_tasks()

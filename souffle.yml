@@ -1,0 +1,6 @@
+db:
+  sqlite:
+    file: example.db
+  dialect: sqlite # default
+  host: localhost
+  verbose: false

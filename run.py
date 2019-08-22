@@ -9,18 +9,21 @@ def cli():
     pass
 
 
-@click.option('--path', prompt=True)
 @click.command(help="Start a worker")
-def worker(path):
+@click.option('--config', help='Path to your config.yml')
+def worker(config):
     click.echo('Starting a Worker')
-    start_worker(path)
+    start_worker(config)
 
 
 @click.command(help="Start the scheduler")
-@click.option('--path', prompt=True)
-def scheduler(path):
+@click.option('-p', '--path', '_path', prompt=True)
+@click.option('-c', '--config', '_config', help='Path to your config.yml')
+@click.option('-w', '--run_with_worker', '_no_worker', default=False)
+def scheduler(_path, _config, _no_worker):
     click.echo('Starting Scheduler...')
-    start_scheduler(path)
+    click.echo(f'Loding config from: {_config}')
+    start_scheduler(_path, _config, _no_worker)
 
 
 @click.command(help="Trigger a schedule by name")

@@ -1,4 +1,4 @@
-from souffle.database import Schedule, Task, Flow, Session
+from souffle.database import Schedule, Task, Flow, get_session
 import inspect
 import pickle
 
@@ -12,13 +12,20 @@ class FlowNestingTooDeep(Exception):
 
 
 def schedule(name, run_at, flow):
-    session = Session()
+    session = get_session()
     _schedule = Schedule(name=name, run_at=run_at, flow=pickle.dumps(flow))
     for _task in flow:
         if type(_task) is list:
             for t in _task:
                 if type(t) is list:
                     raise FlowNestingTooDeep('Reached max nesting level in flow. Only 2 levels allowed')
+    r = session.query(Schedule).filter(Schedule.name.is_(name)).first()
+    if r is not None:
+        # There is already a schedule, let's update it
+        r.run_at = run_at
+        r.flow = pickle.dumps(flow)
+        session.commit()
+        return
     session.add(_schedule)
     session.commit()
 

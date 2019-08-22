@@ -32,10 +32,10 @@ schedule(
 )
 
 async def e1f1():
-    print('e1f1')
+    print('e1f1 - An async function!')
 
-async def e1f2():
-    print('e1f2')
+def e1f2():
+    print('e1f2 - Regular functions work too')
 
 async def e1f3():
     print('e1f3')

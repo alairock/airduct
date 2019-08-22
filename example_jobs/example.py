@@ -3,7 +3,7 @@ from souffle import schedule, task
 
 schedule(
     name='ExampleFlow',
-    run_at='* * * * *',
+    run_at='*/3 * * * *',
     flow=[
         task('read_users'),
         [task('e1f2'), task('e1f3', can_fail=True)],

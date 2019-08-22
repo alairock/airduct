@@ -12,7 +12,7 @@ schedule(
 )
 
 
-async def read_users():
+def read_users():
     print('yo read users')
     # for i in range(10000):  # need to process a LOT of tasks
     #     await send_to_worker(process_a_worker_task(i))
