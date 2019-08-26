@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "soairduct"
+name = "airduct"
 version = "0.1.0"
 description = ""
 authors = ["Skyler Lewis <skyler.lewis@canopytax.com>"]
