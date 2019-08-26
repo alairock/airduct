@@ -6,7 +6,7 @@ def getenv(name, default=None):
     env_prefix = os.getenv('ENV_PREFIX', '')
     value = os.getenv(env_prefix + name, default)
 
-    c = os.environ.get('SOUFFLE_CONFIG_FILE')
+    c = os.environ.get('AIRDUCT_CONFIG_FILE')
     with open(c) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 

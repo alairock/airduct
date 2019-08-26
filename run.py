@@ -1,6 +1,6 @@
 import click
 import asyncio
-from souffle.core import start_scheduler, start_worker
+from airduct.core import start_scheduler, start_worker
 loop = asyncio.get_event_loop()
 
 

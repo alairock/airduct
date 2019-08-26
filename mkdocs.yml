@@ -1,4 +1,4 @@
-site_name: Souffle
+site_name: Airduct
 site_description: 'Simple Pipeline Scheduler in Python'
 site_author: 'Skyler Lewis'
 
@@ -11,7 +11,7 @@ theme:
         - yaml
         - django
 
-    repo_url: https://github.com/alairock/souffle
+    repo_url: https://github.com/alairock/airduct
 
 plugins:
     - search

@@ -1,4 +1,4 @@
-from souffle import schedule, task
+from airduct import schedule, task
 
 
 schedule(

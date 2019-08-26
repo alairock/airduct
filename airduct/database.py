@@ -1,7 +1,7 @@
 import pickle
 import datetime
-from souffle.logger import logger
-from souffle.config import getenv
+from airduct.logger import logger
+from airduct.config import getenv
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, and_

@@ -3,14 +3,14 @@ import os
 import pickle
 import crontab
 import importlib
-from souffle import logger
-from souffle.flowfinder import find_flow_files
-from souffle.database import mark_task, has_concurrent_flow, create_flow_record, \
+from airduct import logger
+from airduct.flowfinder import find_flow_files
+from airduct.database import mark_task, has_concurrent_flow, create_flow_record, \
     create_task_record, fetch_task, initdb, fetch_schedules
 import warnings
 import time
 import datetime
-from souffle.logger import logger
+from airduct.logger import logger
 
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -40,7 +40,7 @@ def start_flow(schedule):
 
 
 def start_scheduler(path, config, no_worker=False):
-    os.environ['SOUFFLE_CONFIG_FILE'] = config
+    os.environ['AIRDUCT_CONFIG_FILE'] = config
     session = initdb()
     find_flow_files(path)
     schedules = fetch_schedules()
@@ -54,7 +54,7 @@ def start_scheduler(path, config, no_worker=False):
 
 
 def start_worker(config):
-    os.environ['SOUFFLE_CONFIG_FILE'] = config
+    os.environ['AIRDUCT_CONFIG_FILE'] = config
     initdb()
     while True:
         if work_on_tasks() == 'sleep':

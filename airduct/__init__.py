@@ -1,4 +1,4 @@
-from souffle.database import Schedule, Task, Flow, get_session
+from airduct.database import Schedule, Task, Flow, get_session
 import inspect
 import pickle
 
