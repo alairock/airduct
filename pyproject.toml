@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airduct"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Skyler Lewis <skyler.lewis@canopytax.com>"]
 repository = "https://github.com/alairock/airduct.git"
