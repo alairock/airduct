@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airduct"
-version = "0.1.4"
+version = "0.1.5"
 description = "Simple Pipeline Scheduler in Python"
 authors = ["Skyler Lewis <skyler.lewis@canopytax.com>"]
 repository = "https://github.com/alairock/airduct.git"
