@@ -1,6 +1,6 @@
 import click
 import asyncio
-from airduct.core import start_scheduler, start_worker
+from airduct.core import start_scheduler, start_worker, trigger_schedule
 loop = asyncio.get_event_loop()
 
 
@@ -27,7 +27,10 @@ def scheduler(_path, _config, _no_worker):
 
 
 @click.command(help="Trigger a schedule by name")
-def trigger():
+@click.option('-c', '--config', '_config', help='Path to your config.yml')
+@click.argument('name')
+def trigger(_config, name):
+    trigger_schedule(_config, name)
     click.echo('Run a schedule by name')
 
 

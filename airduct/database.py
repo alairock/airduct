@@ -14,7 +14,7 @@ Session = sessionmaker()
 SeshCache = None
 
 
-def _setup_config():
+def setup_config():
     global ENGINE, Session
     verbose = getenv('DB_VERBOSE', False)
     encoding = getenv('DB_ENCODING', 'utf-8')
@@ -80,7 +80,7 @@ class Schedule(Base):
 
 
 def initdb():
-    _setup_config()
+    setup_config()
     logger.info('Setting up database tables')
     Base.metadata.create_all(ENGINE)
     logger.info('Complete setting up database tables')
@@ -90,6 +90,12 @@ def initdb():
 def fetch_schedules():
     session = get_session()
     results = session.query(Schedule).all()
+    return results
+
+
+def fetch_schedule(name):
+    session = get_session()
+    results = session.query(Schedule).filter(Schedule.name == name).first()
     return results
 
 

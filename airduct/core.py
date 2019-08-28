@@ -6,7 +6,7 @@ import importlib
 from airduct import logger
 from airduct.flowfinder import find_flow_files
 from airduct.database import mark_task, has_concurrent_flow, create_flow_record, \
-    create_task_record, fetch_task, initdb, fetch_schedules
+    create_task_record, fetch_task, initdb, fetch_schedules, fetch_schedule, setup_config
 import warnings
 import time
 import datetime
@@ -57,6 +57,14 @@ def start_scheduler(path, config, no_worker=False):
         time.sleep(1)
 
 
+def trigger_schedule(config, name):
+    os.environ['AIRDUCT_CONFIG_FILE'] = config or ''
+    setup_config()
+    schedule = fetch_schedule(name)
+    if schedule is not None:
+        start_flow(schedule)
+
+
 def start_worker(config):
     os.environ['AIRDUCT_CONFIG_FILE'] = config
     initdb()
@@ -65,6 +73,20 @@ def start_worker(config):
             time.sleep(1)  # No work to do, let's not cruise so fast, and pound the db.
             # Maybe make this configurable in the futer
 
+def _load_module(task):
+    module = None
+    try:
+        task_definition = pickle.loads(task.pickled_task)
+        module = importlib.import_module(task_definition['module'])
+        task_func = getattr(module, task_definition['func_name'])
+        return task_func
+    except AttributeError:
+        msg = f'{task.function_name} not found in {module.__file__}'
+        raise Exception(msg)
+    except ModuleNotFoundError as e:
+        raise Exception(f'Module not found, maybe it doesnt exist anymore? '
+                        f'{task_definition["module"]}')
+
 
 def work_on_tasks():
     task = fetch_task()
@@ -72,19 +94,8 @@ def work_on_tasks():
         return 'sleep'
 
     logger.info(f'Starting task: {task.id}')
-    task_definition = pickle.loads(task.pickled_task)
-    module = importlib.import_module(task_definition['module'])
     try:
-        task_func = getattr(module, task_definition['func_name'])
-    except AttributeError:
-        msg = f'{task.function_name} not found in {module.__file__}'
-        logger.error(msg)
-        raise Exception(msg)
-    except Exception as e:
-        logger.error(f'An unknown error happened: {e}')
-        raise e
-
-    try:
+        task_func = _load_module(task)
         # TODO: If task is taking too long, then kill it. This would be a configurable field on the Task object.
         # eg: `if start_time + task.timout > now(): Kill task_func
         if asyncio.iscoroutinefunction(task_func):
