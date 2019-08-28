@@ -81,3 +81,47 @@ Trigger a flow, outside of it's defined schedule
 Options:
 - `-c` or `--config` path to your config.yaml
 - `--help` shows available options
+
+## Environment Variables
+Environment variables allow you to override your configuration file settings, helping keep secrets out of your repo.
+
+### Axing Ambiguity
+Some of these environment variables migt be generic enough to collide with your own env vars or your dependencies vars. To overcome this, set a prefix, which will allow you to namespace your airduct env vars.
+
+- `ENV_PREFIX`
+
+For example `ENV_PREFIX=AIRDUCT_` will force airduct to look for it's environment variables with `AIRDUCT_` at the beginning. eg. `AIRDUCT_DB_NAME`
+
+### Database env vars
+Airduct uses Sqlalchemy, so you can use any database in Airduct that Sqlalchemy can. Airduct has exposed much of the Sqlalchemy configuration, see below.
+- `DB_VERBOSE` - Default `False`. Noisy verboseness from sqlalchemy's logger
+- `DB_ENCODING` - Default `utf-8`. See Sqlalchemy for options
+- `DB_DIALECT` - Default `sqlite`. The database type you want to use.
+- `DB_DRIVER` - The database driver the dialect uses.
+- `DB_USER` - Database username. Not required.
+- `DB_PASS` - Database password. Not required
+- `DB_HOSTNAME` - Default `localhost`
+- `DB_PORT` - Required for most dialects
+- `DB_NAME` - Required, no defaults
+- `DB_SQLITE_FILE` - Required if you wish to use non-in-memory sqlite
+- `DB_DSN` - If you just want to pass your own DSN
+
+## Config File
+The config file allows you to define your database connection without setting environment variables.
+
+example file:
+
+```yaml
+db:
+#  sqlite:
+#    file: example.db
+  dialect: mysql
+  driver: pymysql
+  user: guest
+  pass: guest
+  port: 3306
+  host: localhost
+  name: mydb
+  verbose: false
+
+```
