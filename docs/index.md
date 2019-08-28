@@ -94,6 +94,7 @@ For example `ENV_PREFIX=AIRDUCT_` will force airduct to look for it's environmen
 
 ### Database env vars
 Airduct uses Sqlalchemy, so you can use any database in Airduct that Sqlalchemy can. Airduct has exposed much of the Sqlalchemy configuration, see below.
+
 - `DB_VERBOSE` - Default `False`. Noisy verboseness from sqlalchemy's logger
 - `DB_ENCODING` - Default `utf-8`. See Sqlalchemy for options
 - `DB_DIALECT` - Default `sqlite`. The database type you want to use.
