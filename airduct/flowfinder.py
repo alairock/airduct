@@ -15,6 +15,7 @@ def import_submodules(package, recursive=True):
 
 
 def find_flow_files(folder_path):
-    for module_name in import_submodules(folder_path):
+    modules = import_submodules(folder_path)
+    for module_name in modules:
         importlib.import_module(module_name)
-
+    return modules

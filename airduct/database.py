@@ -4,23 +4,24 @@ from airduct.logger import logger
 from airduct.config import getenv
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, and_
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, and_, PickleType
 from sqlalchemy.sql import func
 
 
 Base = declarative_base()
 ENGINE = None
 Session = sessionmaker()
+SeshCache = None
 
 
 def _setup_config():
     global ENGINE, Session
     verbose = getenv('DB_VERBOSE', False)
     encoding = getenv('DB_ENCODING', 'utf-8')
-    dialect = '+'.join([getenv('DB_DIALECT', 'sqlite'), getenv('DB_DRIVER', '')])
+    dialect = '+'.join([x for x in [getenv('DB_DIALECT', 'sqlite'), getenv('DB_DRIVER', None)] if x is not None])
     credentials = ':'.join([getenv('DB_USER', ''), getenv('DB_PASS', '')]) + '@'
     hostname = getenv('DB_HOSTNAME')
-    dbport = ':' + getenv('DB_PORT') if getenv('DB_PORT') is not None else ''
+    dbport = ':' + str(getenv('DB_PORT')) if getenv('DB_PORT') is not None else ''
     dbname = '/' + getenv('DB_NAME') if getenv('DB_NAME') is not None else ''
     sqlite_file = getenv('DB_SQLITE_FILE', ':memory:')
     colon_style = f':///{sqlite_file}' if getenv('DB_DIALECT', 'sqlite') == 'sqlite' else '://'
@@ -33,8 +34,11 @@ def _setup_config():
 
 
 def get_session():
-    return Session()
-
+    global SeshCache
+    if SeshCache is None:
+        SeshCache = Session()
+        return SeshCache
+    return SeshCache
 
 class Task(Base):
     __tablename__ = 'tasks'
@@ -42,9 +46,9 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     status = Column(String)
     flow_id = Column(Integer)
-    parents = Column(String)
+    parents = Column(PickleType)
     step = Column(Integer)
-    pickled_task = Column(String)
+    pickled_task = Column(PickleType)
     can_fail = Column(Boolean)
     logs = Column(String)
     completed_at = Column(DateTime)
@@ -69,7 +73,8 @@ class Schedule(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
     run_at = Column(String)
-    flow = Column(String)
+    flow = Column(PickleType)
+    originated_file = Column(String)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
 
@@ -108,7 +113,7 @@ def create_task_record(flow_id, parents, step, task, pickled_task):
     session = get_session()
     task = Task(
         flow_id=flow_id,
-        parents=str(parents) if len(parents) == 0 else pickle.dumps(parents),
+        parents=None if len(parents) == 0 else pickle.dumps(parents),
         step=step,
         can_fail=task.get('can_fail', False),
         pickled_task=pickled_task
@@ -124,12 +129,14 @@ def fetch_task():
     results = session.query(Flow, Task) \
         .join(Task, and_(Task.flow_id == Flow.id, Task.status.is_(None)), isouter=True) \
         .filter(Flow.status == 'InProgress') \
-        .filter(Task.parents.is_('[]')) \
+        .filter(Task.parents.is_(None)) \
         .first()
 
     if results is None:
         return results
     task = results[1]
+    if task is None:
+        return task
     task.status = 'InProgress'
     session.commit()
     return task
@@ -154,9 +161,9 @@ def _update_children(task):
     results = session.query(Task).filter(Task.flow_id == task.flow_id).filter(Task.step == int(task.step)+1).all()
     for r in results:
         if not isinstance(r.parents, str):
-            parents = pickle.loads(r.parents)
-            new_parents = parents.remove(task.id)
-            r.parents = str([]) if not new_parents or len(new_parents) == 0 else pickle.dumps(new_parents)
+            parents = None if r.parents is None else pickle.loads(r.parents)
+            new_parents = None if parents is None else parents.remove(task.id)
+            r.parents = None if new_parents is None or len(new_parents) == 0 else pickle.dumps(new_parents)
     session.commit()
     if len(results) == 0:
         logger.info(f'Flow ended: {task.flow_id}')
