@@ -9,6 +9,8 @@ def getenv(name, default=None):
     global ENV_CONFIG
     env_prefix = os.getenv('ENV_PREFIX', '')
     value = os.getenv(env_prefix + name, default)
+    if value is not None:
+        return value
 
     c = os.environ.get('AIRDUCT_CONFIG_FILE')
     config_file_value = ENV_CONFIG
