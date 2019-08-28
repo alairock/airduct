@@ -130,6 +130,7 @@ def fetch_task():
         .join(Task, and_(Task.flow_id == Flow.id, Task.status.is_(None)), isouter=True) \
         .filter(Flow.status == 'InProgress') \
         .filter(Task.parents.is_(None)) \
+        .order_by(Task.step) \
         .first()
 
     if results is None:
