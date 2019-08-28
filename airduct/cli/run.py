@@ -1,6 +1,7 @@
 import click
 import asyncio
 from airduct.core import start_scheduler, start_worker, trigger_schedule
+from airduct.gui.gui import run as gui_run
 loop = asyncio.get_event_loop()
 
 
@@ -34,9 +35,16 @@ def trigger(_config, name):
     click.echo('Run a schedule by name')
 
 
+@click.command(help="Start a webserver for the GUI")
+@click.option('-c', '--config', '_config', help='Path to your config.yml')
+def gui(_config):
+    gui_run(_config)
+
+
 cli.add_command(worker)
 cli.add_command(scheduler)
 cli.add_command(trigger)
+cli.add_command(gui)
 
 if __name__ == '__main__':
     cli()
