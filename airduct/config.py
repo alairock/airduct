@@ -8,7 +8,7 @@ ENV_CONFIG = None
 def getenv(name, default=None):
     global ENV_CONFIG
     env_prefix = os.getenv('ENV_PREFIX', '')
-    value = os.getenv(env_prefix + name, default)
+    value = os.getenv(env_prefix + name)
     if value is not None:
         return value
 
@@ -30,5 +30,5 @@ def getenv(name, default=None):
         config_file_value = config_file_value.get(v.lower(), None if index + 1 == len(name_split) else {})
 
     if config_file_value is None:
-        return value
+        return default
     return config_file_value
