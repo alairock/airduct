@@ -1,6 +1,8 @@
 # airduct
 Simple Pipeline Scheduler in Python
 
+![Airduct Screenshot](screenshot.png)
+
 ## Links
 
 - [Github](https://github.com/alairock/airduct)
