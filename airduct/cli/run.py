@@ -1,7 +1,7 @@
 import click
 import asyncio
 from airduct.core import start_scheduler, start_worker, trigger_schedule
-from airduct.gui.gui import run as gui_run
+from airduct.api.api import run as gui_run
 loop = asyncio.get_event_loop()
 
 

@@ -99,6 +99,16 @@ def fetch_schedule(name):
     return results
 
 
+def fetch_flows(name):
+    session = get_session()
+    return session.query(Flow).filter(Flow.name.in_([name]))\
+        .order_by(Flow.created_at.desc()).all()
+
+def fetch_tasks(flow_id):
+    session = get_session()
+    return session.query(Task).filter(Task.flow_id == flow_id)\
+        .order_by(Task.step.asc()).all()
+
 def has_concurrent_flow(schedule):
     session = get_session()
     r = session.query(Flow).filter(Flow.name.in_([schedule.name])).filter(Flow.status.in_(['InProgress'])).all()
