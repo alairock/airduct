@@ -15,16 +15,37 @@ class Flows extends React.Component {
         this.state = {
             flow: props.location.flow,
             flow_id: props.match.params.flow_id,
-            rows: []
+            rows: [],
+            keep_checking: true
         }
     }
 
-    componentDidMount() {
+    checkStatus() {
         axios.get('http://127.0.0.1:5000/api/tasks/'+this.state.flow_id).then(result => {
-            this.setState({'rows': result.data});
+            let keep_checking = false;
+            for(let i = 0; i < result.data.length; i++) {
+                if (result.data[i].status !== 'Complete' ) {
+
+                    keep_checking = true
+                }
+            }
+            this.setState({'rows': result.data, 'keep_checking': keep_checking});
+            if (keep_checking === false) {
+                clearInterval(this.interval);
+            }
         });
     }
 
+    componentDidMount() {
+        this.checkStatus();
+        if (this.state.keep_checking === true){
+            this.interval = setInterval(() => this.checkStatus(), 5000);
+        }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
     render()
     {
         return (
