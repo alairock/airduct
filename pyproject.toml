@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airduct"
-version = "0.1.6"
+version = "0.1.7"
 description = "Simple Pipeline Scheduler in Python"
 authors = ["Skyler Lewis <skyler.lewis@canopytax.com>"]
 repository = "https://github.com/alairock/airduct.git"
@@ -18,6 +18,7 @@ sqlalchemy = "^1.3"
 pyyaml = "^5.1"
 psycopg2 = "^2.8"
 flask = "^1.1"
+flask_cors = "^3.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -130,10 +130,23 @@ db:
 ## GUI
 The gui is a simple react app. There is no security currently added to the web app, so you may want to limit where you deploy the webapp, or just run it locally. 
 
-To run:
+### Backend
+The backend is a simple restful api. Run with `$ airduct api --config airduct.yml`
 
+### Frontend
+To run, first build the webapp with `$ airduct webapp`, which will create a folder in the directory you are running the command from named `build`
+
+Then upload the folder to your webserver or serve locally with your favorite server. 
+
+example:
 ```bash
-$ cd webapp
-$ yarn install
-$ yarn start
+$ airduct webapp
+Host [http://localhost:5000]: http://hostname/path/to/api
+You must have node/yarn installed
+yarn install v1.17.3
+[1/4] Resolving packages...
+...
+...
+Done in 5.12s.
+$ cd build && python3 -m http.server
 ```
