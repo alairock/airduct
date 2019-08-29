@@ -126,3 +126,14 @@ db:
   verbose: false
 
 ```
+
+## GUI
+The gui is a simple react app. There is no security currently added to the web app, so you may want to limit where you deploy the webapp, or just run it locally. 
+
+To run:
+
+```bash
+$ cd webapp
+$ yarn install
+$ yarn start
+```
