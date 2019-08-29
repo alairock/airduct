@@ -44,7 +44,7 @@ def api(_config):
 
 
 @click.command(help="Build a version of the webapp for production")
-@click.option('-h', '--host', prompt=True, help="BaseURL for API. default: http://localhost:5000", default="http://localhost:5000")
+@click.option('-H', '--host', prompt=True, help="BaseURL for API. default: http://localhost:5000", default="http://localhost:5000")
 def webapp(host):
     from pathlib import Path
     click.echo('You must have node/yarn installed')

@@ -82,6 +82,18 @@ Options:
 - `-c` or `--config` path to your config.yaml
 - `--help` shows available options
 
+### api
+Start the api service
+Options:
+- `-c` or `--config` path to your config.yaml
+- `--help` shows available options
+
+### webapp
+Build the frontend ReactJS app for use locally or production
+Options:
+- `-H` or `--host` BaseURL for API. default: http://localhost:5000, will airduct will prompt if this is not provided
+- `--help` shows available options
+
 ## Environment Variables
 Environment variables allow you to override your configuration file settings, helping keep secrets out of your repo.
 
