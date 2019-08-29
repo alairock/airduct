@@ -65,6 +65,7 @@ By default it uses a sqlite in-memory database. If using the in-memory database,
 Start the scheduler, schedules flows.
 
 Options:
+
   - `-p` or `--path` path to your flows directory
   - `-c` or `--config` path to your config.yaml
   - `-w` or `--run-with-worker` wun scheduler and worker in one process
@@ -74,6 +75,7 @@ Options:
 Run this command to work on scheduled flows' tasks.
 
 Options:
+
   - `-c` or `--config` path to your config.yaml
   - `--help` shows available options
 
@@ -82,6 +84,7 @@ Options:
 Trigger a flow, outside of it's defined schedule
 
 Options:
+
   - `-c` or `--config` path to your config.yaml
   - `--help` shows available options
 
@@ -89,6 +92,7 @@ Options:
 Start the api service
 
 Options:
+
   - `-c` or `--config` path to your config.yaml
   - `--help` shows available options
 
@@ -96,6 +100,7 @@ Options:
 Build the frontend ReactJS app for use locally or production
 
 Options:
+
   - `-H` or `--host` BaseURL for API. default: http://localhost:5000, will airduct will prompt if this is not provided
   - `--help` shows available options
 
