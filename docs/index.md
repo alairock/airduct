@@ -65,39 +65,39 @@ By default it uses a sqlite in-memory database. If using the in-memory database,
 Start the scheduler, schedules flows.
 
 Options:
-- `-p` or `--path` path to your flows directory
-- `-c` or `--config` path to your config.yaml
-- `-w` or `--run-with-worker` wun scheduler and worker in one process
-- `--help` shows available options
+  - `-p` or `--path` path to your flows directory
+  - `-c` or `--config` path to your config.yaml
+  - `-w` or `--run-with-worker` wun scheduler and worker in one process
+  - `--help` shows available options
 
 ### worker
 Run this command to work on scheduled flows' tasks.
 
 Options:
-- `-c` or `--config` path to your config.yaml
-- `--help` shows available options
+  - `-c` or `--config` path to your config.yaml
+  - `--help` shows available options
 
 
 ### trigger
 Trigger a flow, outside of it's defined schedule
 
 Options:
-- `-c` or `--config` path to your config.yaml
-- `--help` shows available options
+  - `-c` or `--config` path to your config.yaml
+  - `--help` shows available options
 
 ### api
 Start the api service
 
 Options:
-- `-c` or `--config` path to your config.yaml
-- `--help` shows available options
+  - `-c` or `--config` path to your config.yaml
+  - `--help` shows available options
 
 ### webapp
 Build the frontend ReactJS app for use locally or production
 
 Options:
-- `-H` or `--host` BaseURL for API. default: http://localhost:5000, will airduct will prompt if this is not provided
-- `--help` shows available options
+  - `-H` or `--host` BaseURL for API. default: http://localhost:5000, will airduct will prompt if this is not provided
+  - `--help` shows available options
 
 ## Environment Variables
 Environment variables allow you to override your configuration file settings, helping keep secrets out of your repo.
