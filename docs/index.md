@@ -101,7 +101,7 @@ Build the frontend ReactJS app for use locally or production
 
 Options:
 
-  - `-H` or `--host` BaseURL for API. default: http://localhost:5000, will airduct will prompt if this is not provided
+  - `-H` or `--host` BaseURL for API. default: http://localhost:5000, airduct will prompt if this is not provided
   - `--help` shows available options
 
 ## Environment Variables
