@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { HashRouter as Router, Route } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,9 +10,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import NotificationsIcon from '@material-ui/icons/Notifications';import './App.css';
-import Schedules from './Schedules'
+import Dashboard from './Dashboard'
 import Flows from "./Flows";
 import Tasks from "./Tasks"
 
@@ -128,13 +127,11 @@ function App() {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <Paper className={classes.paper}>
                                 <Router>
-                                    <Route path="/" exact component={Schedules} />
-                                    <Route path="/flows/:schedule_name" component={Flows} />
-                                    <Route path="/tasks/:flow_id" component={Tasks} />
+                                    <Route path="/" exact component={() => <Dashboard style={classes} />} />
+                                    <Route path="/flows/:schedule_name" component={props => <Flows {...props} style={classes}/>} />
+                                    <Route path="/tasks/:flow_id" component={props => <Tasks  {...props} style={classes}/>} />
                                 </Router>
-                            </Paper>
                         </Grid>
                     </Grid>
                 </Container>

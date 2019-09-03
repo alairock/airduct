@@ -98,8 +98,17 @@ def fetch_schedule(name):
     results = session.query(Schedule).filter(Schedule.name == name).first()
     return results
 
+def fetch_flows():
+    session = get_session()
+    current_time = datetime.datetime.utcnow()
+    yesterday = current_time - datetime.timedelta(days=7)
+    return session.query(Flow) \
+        .filter(Flow.created_at >= yesterday) \
+        .order_by(Flow.created_at.desc()) \
+        .limit(10) \
+        .all()
 
-def fetch_flows(name):
+def fetch_flow(name):
     session = get_session()
     return session.query(Flow).filter(Flow.name.in_([name]))\
         .order_by(Flow.created_at.desc()).all()

@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
 import axios from 'axios'
+import Paper from "@material-ui/core/Paper";
 
 
 class Flows extends React.Component {
@@ -49,6 +50,7 @@ class Flows extends React.Component {
     render()
     {
         return (
+            <Paper className={this.props.style.paper}>
             <React.Fragment>
                 <Title>Task</Title>
 
@@ -75,6 +77,7 @@ class Flows extends React.Component {
                     </TableBody>
                 </Table>
             </React.Fragment>
+            </Paper>
         );
     }
 }

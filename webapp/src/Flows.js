@@ -8,6 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
 import axios from 'axios'
 import { Link } from "react-router-dom";
+import Paper from "@material-ui/core/Paper";
 
 
 class Flows extends React.Component {
@@ -28,8 +29,9 @@ class Flows extends React.Component {
     render()
     {
         return (
+            <Paper className={this.props.style.paper}>
             <React.Fragment>
-                <Title>Flows</Title>
+                <Title>Flows - {this.state.schedule_name}</Title>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -42,8 +44,8 @@ class Flows extends React.Component {
                     <TableBody>
                         {this.state.rows.map(row => (
                             <TableRow key={row.id}>
-                                <TableCell>{row.status}</TableCell>
-                                <TableCell><Link to={{pathname: "/tasks/"+row.id, flow: row}}>{row.name}</Link></TableCell>
+                                <TableCell><Link to={"/tasks/"+row.id}>{row.status}</Link></TableCell>
+                                <TableCell>{row.name}</TableCell>
                                 <TableCell>{row.created_at}</TableCell>
                                 <TableCell>{row.updated_at}</TableCell>
                             </TableRow>
@@ -51,6 +53,7 @@ class Flows extends React.Component {
                     </TableBody>
                 </Table>
             </React.Fragment>
+            </Paper>
         );
     }
 }
