@@ -93,7 +93,7 @@ def work_on_tasks():
     if task is None:
         return 'sleep'
 
-    logger.info(f'Starting task: {task.id}')
+    logger.info(f'Starting task: {task.id}, Flow: {task.flow_id}')
     try:
         task_func = _load_module(task)
         # TODO: If task is taking too long, then kill it. This would be a configurable field on the Task object.
@@ -112,4 +112,4 @@ def work_on_tasks():
         mark_task(task, 'Error', message=str(e))
         return
     mark_task(task)
-    logger.info(f'Task finished: {task.id}')
+    logger.info(f'Task finished: {task.id}, Flow: {task.flow_id}')

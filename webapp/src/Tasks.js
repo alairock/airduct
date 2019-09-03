@@ -57,6 +57,7 @@ class Flows extends React.Component {
                 <Table size="small">
                     <TableHead>
                         <TableRow>
+                            <TableCell>id</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Step</TableCell>
                             <TableCell>Completed At</TableCell>
@@ -67,6 +68,7 @@ class Flows extends React.Component {
                     <TableBody>
                         {this.state.rows.map(row => (
                             <TableRow key={row.id}>
+                                <TableCell>{row.id}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell>{row.step}</TableCell>
                                 <TableCell>{row.completed_at}</TableCell>
