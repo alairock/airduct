@@ -18,7 +18,7 @@ class Dashboard extends React.Component
 
     componentDidMount()
     {
-        axios.get('http://127.0.0.1:5000/api/schedules').then(result => {
+        axios.get(process.env.REACT_APP_API_URL+'/api/schedules').then(result => {
             this.setState({'rows': result.data});
         });
     }

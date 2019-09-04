@@ -21,7 +21,7 @@ class Flows extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://127.0.0.1:5000/api/flows/'+this.state.schedule_name).then(result => {
+        axios.get(process.env.REACT_APP_API_URL+'/api/flows/'+this.state.schedule_name).then(result => {
             this.setState({'rows': result.data});
         });
     }

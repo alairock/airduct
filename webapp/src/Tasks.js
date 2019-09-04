@@ -22,7 +22,7 @@ class Flows extends React.Component {
     }
 
     checkStatus() {
-        axios.get('http://127.0.0.1:5000/api/tasks/'+this.state.flow_id).then(result => {
+        axios.get(process.env.REACT_APP_API_URL+this.state.flow_id).then(result => {
             let keep_checking = false;
             for(let i = 0; i < result.data.length; i++) {
                 if (result.data[i].status !== 'Complete' ) {

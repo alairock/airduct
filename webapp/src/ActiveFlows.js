@@ -18,7 +18,7 @@ class Active extends React.Component {
     }
 
     checkStatus() {
-        axios.get('http://127.0.0.1:5000/api/flows').then(result => {
+        axios.get(process.env.REACT_APP_API_URL+'/api/flows').then(result => {
             let keep_checking = false;
             for(let i = 0; i < result.data.length; i++) {
                 if (result.data[i].status !== 'Complete' ) {
