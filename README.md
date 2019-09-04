@@ -48,5 +48,5 @@ async def e1f4():
 
 Run: `$ airduct schedule --path /path/to/folder`
 
-By default it uses a sqlite in-memory database. If using the in-memory database, it will also automatically run as a worker, in addition to a scheduler. If you wish to use a non-memory sqlite database, you will need to also run a worker (could be on same box, or separate) See the documentation for more info.
+By default it uses a sqlite in-memory database. If using the in-memory database, it will also automatically run as a worker, in addition to a scheduler. If you wish to use a non in-memory sqlite database, you will need to also run a worker (could be on same box, or separate) See the documentation for more info.
 
