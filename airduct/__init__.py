@@ -1,7 +1,7 @@
 from airduct.database import Schedule, Task, Flow, get_session
 import inspect
 import pickle
-import os
+
 
 class TaskNotFoundError(AttributeError):
     pass

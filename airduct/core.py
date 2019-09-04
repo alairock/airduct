@@ -73,8 +73,10 @@ def start_worker(config):
             time.sleep(1)  # No work to do, let's not cruise so fast, and pound the db.
             # Maybe make this configurable in the futer
 
+
 def _load_module(task):
     module = None
+    task_definition = {"module": ""}
     try:
         task_definition = pickle.loads(task.pickled_task)
         module = importlib.import_module(task_definition['module'])
@@ -103,13 +105,21 @@ def work_on_tasks():
             loop.run_until_complete(task_func())
         else:
             task_func()
+    except KeyboardInterrupt as e:
+        print('KeyboardInterrupt: Marking task as such.')
+        mark_task(task, 'Interrupted')
+        raise e
+    except SystemExit as e:
+        print('System exiting: Marking task as such.')
+        mark_task(task, 'SIGTERM', message='System asked to exit, handling exit.')
+        raise SystemExit from e
     except Exception as e:
         if not task.can_fail:
             logger.error(f'Something bad happened. {e}')
             mark_task(task, 'Error', message=str(e))
             return
         logger.debug(f'An error happened but your task configuration allowed it. {e}')
-        mark_task(task, 'Error', message=str(e))
+        mark_task(task, 'Error', can_fail=True, message=str(e))
         return
     mark_task(task)
     logger.info(f'Task finished: {task.id}, Flow: {task.flow_id}')

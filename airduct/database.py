@@ -177,7 +177,10 @@ def mark_task(task, status="Complete", can_fail=False, message=''):
     })
     session.commit()
     if status is 'Error' and not can_fail:
-        mark_flow(task.flow_id, status=Error)
+        mark_flow(task.flow_id, status=status)
+        return
+    if status is not 'Complete':
+        mark_flow(task.flow_id, status=status)
         return
     _update_children(task)
 
