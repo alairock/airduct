@@ -47,10 +47,11 @@ def start_scheduler(path, config, no_worker=False):
     # We use set.difference() here instead of ^ since we only want what is the database and not in the files
     removed_modules = set([x.originated_file for x in schedules]).difference(set(flows))
     while True:
+        now = datetime.datetime.now()
         for schedule in schedules:
             if schedule.originated_file in removed_modules:
                 continue
-            if crontab.CronTab(schedule.run_at).test(datetime.datetime.now()):
+            if crontab.CronTab(schedule.run_at).test(now):
                 start_flow(schedule)
         if no_worker or str(session.bind.url) == 'sqlite:///:memory:':
             work_on_tasks()
