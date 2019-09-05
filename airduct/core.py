@@ -55,6 +55,9 @@ def start_scheduler(path, config, no_worker=False):
                 start_flow(schedule)
         if no_worker or str(session.bind.url) == 'sqlite:///:memory:':
             work_on_tasks()
+        # rare edge case: If there are so many jobs that it takes longer than
+        # 1 minute to schedule all of them and it misses the next
+        # minute and that next minute had new tasks to schedule, it will miss them.
         time.sleep(1)
 
 
