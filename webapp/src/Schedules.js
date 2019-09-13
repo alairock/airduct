@@ -19,7 +19,11 @@ class Schedules extends React.Component {
     }
 
     componentDidMount() {
-        axios.get(process.env.REACT_APP_API_URL+'/api/schedules').then(result => {
+        let auth = {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password')
+        };
+        axios.get(process.env.REACT_APP_API_URL+'/api/schedules', {auth: auth}).then(result => {
             this.setState({'rows': result.data});
         });
     }

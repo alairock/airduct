@@ -21,7 +21,11 @@ class Flows extends React.Component {
     }
 
     componentDidMount() {
-        axios.get(process.env.REACT_APP_API_URL+'/api/flows/'+this.state.schedule_name).then(result => {
+        let auth = {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password')
+        };
+        axios.get(process.env.REACT_APP_API_URL+'/api/flows/'+this.state.schedule_name, {auth: auth}).then(result => {
             this.setState({'rows': result.data});
         });
     }

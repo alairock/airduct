@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { HashRouter as Router, Route } from "react-router-dom";
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -26,7 +26,7 @@ function Copyright() {
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = theme => ({
     root: {
         display: 'flex',
     },
@@ -103,42 +103,99 @@ const useStyles = makeStyles(theme => ({
     fixedHeight: {
         height: 240,
     },
-}));
+});
 
-function App() {
-    const classes = useStyles();
-    return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <AppBar position="absolute" className={clsx(classes.appBar)}>
-                <Toolbar className={classes.toolbar}>
-                    <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                        <a href="/" className="headerText">Airduct</a>
-                    </Typography>
-                    <IconButton color="inherit">
-                        <Badge badgeContent={0} color="secondary">
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-            <main className={classes.content}>
-                <div className={classes.appBarSpacer} />
-                <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
+class Login extends React.Component {
+    state = {
+        username: null,
+        password: null
+    };
+    handleLogin = event => {
+        event.preventDefault();
+        localStorage.setItem('username', this.state.username);
+        localStorage.setItem('password', this.state.password);
+        this.props.closeLoginDialog(true)
+    };
+    handleInputChange = event => {
+        if (event.target.name === 'username') {
+            this.setState({username: event.target.value});
+        } else if (event.target.name === 'password') {
+            this.setState({password: event.target.value});
+        }
+    };
+
+    render = () => {
+        return (
+        <div className={this.props.style.root}>
+            <div className="Login">
+                <form onSubmit={this.handleLogin}>
+                    <div>Username: <input type="text" onChange={this.handleInputChange} name="username" placeholder="Username"></input></div>
+                    <div>Password: <input type="password" onChange={this.handleInputChange} name="password" placeholder="Password"></input></div>
+                    <button>Login</button>
+                </form>
+            </div>
+        </div>
+        )
+    }
+}
+
+class App extends React.Component {
+    state = {
+        requireLogin: process.env.REACT_APP_REQUIRE_LOGIN,
+        usernameExists: false
+    };
+
+    closeLoginDialog = (username_exists) => {
+        this.setState({usernameExists: username_exists})
+    };
+
+    componentDidMount() {
+        let has_credentials = localStorage.getItem('username');
+        if (has_credentials) {
+            this.setState({'usernameExists': true})
+        }
+    };
+
+    render = () => {
+        const classes = this.props.classes;
+        if (this.state.requireLogin === 'true' &&  !this.state.usernameExists) {
+            return (
+                <Login style={classes} closeLoginDialog={this.closeLoginDialog} />
+            )
+        }
+        return (
+            <div className={classes.root}>
+                <CssBaseline />
+                <AppBar position="absolute" className={clsx(classes.appBar)}>
+                    <Toolbar className={classes.toolbar}>
+                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+                            <a href="/" className="headerText">Airduct</a>
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={0} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <main className={classes.content}>
+                    <div className={classes.appBarSpacer} />
+                    <Container maxWidth="lg" className={classes.container}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12}>
                                 <Router>
                                     <Route path="/" exact component={() => <Dashboard style={classes} />} />
                                     <Route path="/flows/:schedule_name" component={props => <Flows {...props} style={classes}/>} />
                                     <Route path="/tasks/:flow_id" component={props => <Tasks  {...props} style={classes}/>} />
                                 </Router>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Container>
-                <Copyright />
-            </main>
-        </div>
-    );
+                    </Container>
+                    <Copyright />
+                </main>
+            </div>
+        )
+    };
 }
 
-export default App;
+export default withStyles(useStyles)(App);

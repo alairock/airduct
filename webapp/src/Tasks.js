@@ -22,7 +22,11 @@ class Flows extends React.Component {
     }
 
     checkStatus() {
-        axios.get(process.env.REACT_APP_API_URL+'/api/tasks/'+this.state.flow_id).then(result => {
+        let auth = {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password')
+        };
+        axios.get(process.env.REACT_APP_API_URL+'/api/tasks/'+this.state.flow_id, {auth: auth}).then(result => {
             let keep_checking = false;
             for(let i = 0; i < result.data.length; i++) {
                 if (result.data[i].status !== 'Complete' ) {
