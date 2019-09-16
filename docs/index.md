@@ -174,3 +174,22 @@ yarn install v1.17.3
 Done in 5.12s.
 $ cd build && python3 -m http.server
 ```
+
+### Basic Auth
+Basic auth is available if you want to host the webapp. It is a first step towards securing the frontend of
+the app, but is not required, nor the safest method of security available. Use at your own risk. 
+
+Add the following in your config file. 
+
+```
+basic-auth:
+  enabled: true
+  username: some_username
+  password: some_password
+```
+
+Alternatively these can be set as environment variables eg: `BASIC-AUTH_ENABLED`,`BASIC-AUTH_USERNAME` and `BASIC-AUTH_PASSWORD`
+
+and on the frontend you need to build or run `yarn start` with this environment variable set: `REACT_APP_REQUIRE_LOGIN=true`
+
+All of the above are _required_ for basic auth to work.
