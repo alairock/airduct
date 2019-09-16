@@ -58,6 +58,11 @@ def optional_require(func):
 auth.login_required = optional_require
 
 
+@app.route('/heartbeat')
+def heartbeat():
+    return jsonify({'success': True})
+
+
 @app.route('/api/schedules')
 @auth.login_required
 def schedules():
