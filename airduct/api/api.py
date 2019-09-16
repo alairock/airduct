@@ -64,7 +64,7 @@ def heartbeat():
 
 
 @app.route('/')
-def heartbeat():
+def home():
     return jsonify({'success': True})
 
 
