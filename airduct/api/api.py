@@ -1,7 +1,13 @@
+from functools import wraps
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
+
+from airduct.config import getenv
 from airduct.database import setup_config, fetch_schedules, fetch_flows, fetch_flow, fetch_tasks
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def create_app():
@@ -10,7 +16,18 @@ def create_app():
 
 
 app = create_app()
+auth = HTTPBasicAuth()
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+
+@auth.verify_password
+def verify_password(username, password):
+    users = {
+        getenv('BASIC-AUTH_USERNAME'): generate_password_hash(getenv('BASIC-AUTH_PASSWORD'))
+    }
+    if username in users:
+        return check_password_hash(users.get(username), password)
+    return False
 
 
 def run(config):
@@ -19,7 +36,26 @@ def run(config):
     app.run()
 
 
+old_login_required = auth.login_required
+
+
+def optional_require(func):
+    @wraps(func)
+    def inside_optional_require():
+        require_login = getenv('BASIC-AUTH_ENABLED', False)
+        if require_login:
+            # mad props to @matt from pythondev.slack.com for () at the end of old_login_required(func)()
+            return old_login_required(func)()
+        else:
+            return func()
+    return inside_optional_require
+
+
+auth.login_required = optional_require
+
+
 @app.route('/api/schedules')
+@auth.login_required
 def schedules():
     _schedules = fetch_schedules()
 
@@ -36,6 +72,7 @@ def schedules():
 
 
 @app.route('/api/flows')
+@auth.login_required
 def flows():
     _flows = fetch_flows()
 
@@ -52,6 +89,7 @@ def flows():
 
 
 @app.route('/api/flows/<string:names>')
+@auth.login_required
 def get_flows(names):
     _flows = fetch_flow(names)
 
@@ -68,6 +106,7 @@ def get_flows(names):
 
 
 @app.route('/api/tasks/<string:flow_id>')
+@auth.login_required
 def tasks(flow_id):
     _tasks = fetch_tasks(flow_id)
 

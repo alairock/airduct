@@ -3,3 +3,8 @@ db:
     file: example.db
   dialect: sqlite # default
   verbose: false
+
+basic-auth:
+  enabled: true
+  username: arst
+  password: arst

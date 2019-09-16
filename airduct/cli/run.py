@@ -1,9 +1,9 @@
 import subprocess
-from airduct.logger import logger
 import click
 import asyncio
 from airduct.core import start_scheduler, start_worker, trigger_schedule
 from airduct.api.api import run as api_run
+import signal
 loop = asyncio.get_event_loop()
 
 
@@ -11,14 +11,13 @@ loop = asyncio.get_event_loop()
 def cli():
     pass
 
-import signal
-import time
-def receiveSignal(signalNumber, frame):
-    print('Received:', signalNumber)
-    raise SystemExit('Exiting')
-    return
 
-signal.signal(signal.SIGTERM, receiveSignal)
+def receive_signal(signal_number, frame):
+    print('Received:', signal_number)
+    raise SystemExit('Exiting')
+
+
+signal.signal(signal.SIGTERM, receive_signal)
 
 
 @click.command(help="Start a worker")
