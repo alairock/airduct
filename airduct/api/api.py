@@ -22,8 +22,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 @auth.verify_password
 def verify_password(username, password):
+    username = getenv('BASIC-AUTH_USERNAME')
+    password = getenv('BASIC-AUTH_PASSWORD')
+    if username is None or password is None:
+        raise Exception('Cannot have blank username or password.')
     users = {
-        getenv('BASIC-AUTH_USERNAME'): generate_password_hash(getenv('BASIC-AUTH_PASSWORD'))
+        username: generate_password_hash(password)
     }
     if username in users:
         return check_password_hash(users.get(username), password)
