@@ -63,6 +63,11 @@ def heartbeat():
     return jsonify({'success': True})
 
 
+@app.route('/')
+def heartbeat():
+    return jsonify({'success': True})
+
+
 @app.route('/api/schedules')
 @auth.login_required
 def schedules():
