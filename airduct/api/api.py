@@ -10,12 +10,7 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-def create_app():
-    _app = Flask(__name__)
-    return _app
-
-
-app = create_app()
+app = Flask(__name__)
 auth = HTTPBasicAuth()
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -34,10 +29,16 @@ def verify_password(username, password):
     return False
 
 
+def run_wsgi(config):
+    os.environ['AIRDUCT_CONFIG_FILE'] = config or ''
+    setup_config()
+    return app
+
+
 def run(config):
     os.environ['AIRDUCT_CONFIG_FILE'] = config or ''
     setup_config()
-    app.run(port=getenv('AIRDUCT_PORT', 8339))
+    return app.run(port=getenv('AIRDUCT_PORT', 8339))
 
 
 old_login_required = auth.login_required
