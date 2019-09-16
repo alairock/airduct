@@ -37,7 +37,7 @@ def verify_password(username, password):
 def run(config):
     os.environ['AIRDUCT_CONFIG_FILE'] = config or ''
     setup_config()
-    app.run()
+    app.run(port=getenv('AIRDUCT_PORT', 8339))
 
 
 old_login_required = auth.login_required
