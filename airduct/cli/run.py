@@ -53,7 +53,8 @@ def api(_config):
 
 @click.command(help="Build a version of the webapp for production")
 @click.option('-H', '--host', prompt=True, help="BaseURL for API. default: http://localhost:5000", default="http://localhost:5000")
-def webapp(host):
+@click.option('-L', '--require-login', help='Require login for api requests, (using basic auth)', default=False)
+def webapp(host, require_login):
     from pathlib import Path
     click.echo('You must have node/yarn installed')
     cwd = str(Path(__file__).parent.parent.parent) + '/webapp'
@@ -64,7 +65,7 @@ def webapp(host):
     subprocess.call(
         ['yarn', 'build'],
         cwd=cwd,
-        env={'REACT_APP_API_URL': host}
+        env={'REACT_APP_API_URL': host, 'REACT_APP_REQUIRE_LOGIN': require_login}
     )
     subprocess.call(
         ['mv', cwd+'/build', 'build']
