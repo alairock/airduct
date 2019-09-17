@@ -104,6 +104,7 @@ Build the frontend ReactJS app for use locally or production
 Options:
 
   - `-H` or `--host` BaseURL for API. default: http://localhost:5000, airduct will prompt if this is not provided
+  - `-L`, `--require-login` Require login for api requests, (using basic auth), default=False
   - `--help` shows available options
 
 ## Environment Variables
@@ -155,10 +156,10 @@ db:
 The gui is a simple react app. There is no security currently added to the web app, so you may want to limit where you deploy the webapp, or just run it locally. 
 
 ### Backend
-The backend is a simple restful api. Run with `$ airduct api --config airduct.yml`
+The backend is a simple restful api. Run with `airduct api --config airduct.yml`
 
 ### Frontend
-To run, first build the webapp with `$ airduct webapp`, which will create a folder in the directory you are running the command from named `build`
+To run, first build the webapp with `airduct webapp`, which will create a folder in the directory you are running the command from named `build`
 
 Then upload the folder to your webserver or serve locally with your favorite server. 
 
