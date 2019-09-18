@@ -52,9 +52,11 @@ def api(_config):
 
 
 @click.command(help="Build a version of the webapp for production")
-@click.option('-H', '--host', prompt=True, help="BaseURL for API. default: http://localhost:5000", default="http://localhost:5000")
-@click.option('-L', '--require-login', help='Require login for api requests, (using basic auth)', default=False)
-def webapp(host, require_login):
+@click.option('--host', help="BaseURL for API. default: http://localhost:5000", default="http://localhost:5000")
+@click.option('--web-host', help='Default is relative paths, change this if you need morec control over paths')
+@click.option('--require-login', help='Require login for api requests, (using basic auth)', is_flag=True)
+def webapp(host, web_host, require_login):
+    print('host:', host, 'show_login:', require_login)
     from pathlib import Path
     import tempfile
     click.echo('You must have node/yarn and wget installed on your system.')
@@ -77,7 +79,9 @@ def webapp(host, require_login):
         subprocess.call(
             ['yarn', 'build'],
             cwd=cwd,
-            env={'REACT_APP_API_URL': host, 'REACT_APP_REQUIRE_LOGIN': str(require_login).lower()}
+            env={'REACT_APP_API_URL': host or '',
+                 'PUBLIC_URL': web_host or '',
+                 'REACT_APP_REQUIRE_LOGIN': str(require_login).lower()}
         )
         subprocess.call(
             ['mv', cwd+'/build', 'build']

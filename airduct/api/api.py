@@ -46,13 +46,13 @@ old_login_required = auth.login_required
 
 def optional_require(func):
     @wraps(func)
-    def inside_optional_require():
+    def inside_optional_require(*args, **kwargs):
         require_login = getenv('BASIC-AUTH_ENABLED', False)
         if require_login:
             # mad props to @matt from pythondev.slack.com for () at the end of old_login_required(func)()
-            return old_login_required(func)()
+            return old_login_required(func)(args, kwargs)
         else:
-            return func()
+            return func(args, kwargs)
     return inside_optional_require
 
 
