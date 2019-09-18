@@ -56,22 +56,34 @@ def api(_config):
 @click.option('-L', '--require-login', help='Require login for api requests, (using basic auth)', default=False)
 def webapp(host, require_login):
     from pathlib import Path
-    click.echo('You must have node/yarn installed')
-    cwd = str(Path(__file__).parent.parent.parent) + '/webapp'
-    subprocess.call(
-        ['yarn', 'install'],
-        cwd=cwd,
-    )
-    subprocess.call(
-        ['yarn', 'build'],
-        cwd=cwd,
-        env={'REACT_APP_API_URL': host, 'REACT_APP_REQUIRE_LOGIN': require_login}
-    )
-    subprocess.call(
-        ['mv', cwd+'/build', 'build']
-    )
+    import tempfile
+    click.echo('You must have node/yarn and wget installed on your system.')
 
-    click.echo('To serve now, you can use: $ cd build && python3 -m http.server')
+    with tempfile.TemporaryDirectory() as dirpath:
+        subprocess.call(
+            ['wget', 'https://github.com/alairock/airduct-gui/archive/master.zip'],
+            cwd=dirpath,
+        )
+        subprocess.call(
+            ['unzip', 'master.zip'],
+            cwd=dirpath,
+        )
+        cwd = str(Path(dirpath) / 'airduct-gui-master')
+
+        subprocess.call(
+            ['yarn', 'install'],
+            cwd=cwd,
+        )
+        subprocess.call(
+            ['yarn', 'build'],
+            cwd=cwd,
+            env={'REACT_APP_API_URL': host, 'REACT_APP_REQUIRE_LOGIN': str(require_login).lower()}
+        )
+        subprocess.call(
+            ['mv', cwd+'/build', 'build']
+        )
+
+        click.echo('To serve now, you can use: $ cd build && python3 -m http.server')
 
 
 cli.add_command(worker)
